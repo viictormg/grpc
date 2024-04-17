@@ -5,3 +5,10 @@ CREATE TABLE students (
     name varchar(255) NOT NULL,
     age INTEGER NOT NULL,
 );
+
+DROP TABLE IF EXISTS tests;
+
+CREATE TABLE tests (
+    id VARCHAR(32) PRIMARY KEY,
+    name varchar(255) NOT NULL,
+);
