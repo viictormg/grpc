@@ -1,19 +1,25 @@
 package main
 
+import "fmt"
+
 func main() {
 	// TODO
-	n := 8
-	b := 8
+	fmt.Println(createString(5, 4))
+
+	// for i := 0; i < n; i++ {
+
+	// }
+}
+
+func createString(n, s int) string {
+	cadena := ""
 
 	for i := 0; i < n; i++ {
-		mark := ""
-		for j := 0; j < n; j++ {
-			if j >= (b-1)-i {
-				mark += "#"
-			}
-			b--
+		if i >= s {
+			cadena += "#"
 		}
-
-		println(mark)
+		cadena += "/"
 	}
+
+	return cadena
 }

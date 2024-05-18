@@ -21,4 +21,16 @@ CREATE TABLE questions (
     question varchar(255) NOT NULL,
     answer varchar(255) NOT NULL,
     CONSTRAINT fk_test FOREIGN KEY(test_id) REFERENCES tests(id)
-)
+);
+
+
+
+DROP TABLE IF EXISTS enrollments;
+
+CREATE TABLE enrollments (
+    id VARCHAR(32) PRIMARY KEY,
+    student_id varchar(32) NOT NULL,
+    test_id varchar(32) NOT NULL,
+    CONSTRAINT fk_student FOREIGN KEY(student_id) REFERENCES students(id),
+    CONSTRAINT fk_test FOREIGN KEY(test_id) REFERENCES tests(id)
+);

@@ -3,9 +3,11 @@ package server
 import (
 	"context"
 	"io"
+	"time"
 
 	"github.com/viictormg/grpc/models"
 	"github.com/viictormg/grpc/repository"
+	"github.com/viictormg/grpc/studentpb"
 	"github.com/viictormg/grpc/testpb"
 )
 
@@ -73,5 +75,57 @@ func (s *TestServer) SetQuestions(stream testpb.TestService_SetQuestionsServer) 
 			})
 		}
 	}
+}
 
+func (s *TestServer) EnrollStudents(stream testpb.TestService_EnrollStudentsServer) error {
+	for {
+		msg, err := stream.Recv()
+
+		if err == io.EOF {
+			return stream.SendAndClose(&testpb.SetQuestionResponse{
+				Ok: true,
+			})
+		}
+
+		if err != nil {
+			return err
+		}
+
+		erollment := &models.Enrollment{
+			StudentId: msg.GetStudentId(),
+			TestId:    msg.GetTestId(),
+		}
+
+		err = s.repo.SetEnrollment(context.Background(), erollment)
+
+		if err != nil {
+			return stream.SendAndClose(&testpb.SetQuestionResponse{
+				Ok: false,
+			})
+		}
+	}
+}
+
+func (s *TestServer) GetStudentsPerTest(req *testpb.GetStudentsPerTestRequest, stream testpb.TestService_GetStudentsPerTestServer) error {
+
+	students, err := s.repo.GetStudentsPerTest(context.Background(), req.TestId)
+
+	if err != nil {
+		return err
+	}
+
+	for _, s := range students {
+		student := &studentpb.Student{
+			Id:   s.Id,
+			Name: s.Name,
+			Age:  s.Age,
+		}
+
+		err := stream.Send(student)
+		time.Sleep(2 * time.Second)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
