@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"time"
 
@@ -107,7 +108,6 @@ func (s *TestServer) EnrollStudents(stream testpb.TestService_EnrollStudentsServ
 }
 
 func (s *TestServer) GetStudentsPerTest(req *testpb.GetStudentsPerTestRequest, stream testpb.TestService_GetStudentsPerTestServer) error {
-
 	students, err := s.repo.GetStudentsPerTest(context.Background(), req.TestId)
 
 	if err != nil {
@@ -128,4 +128,44 @@ func (s *TestServer) GetStudentsPerTest(req *testpb.GetStudentsPerTestRequest, s
 		}
 	}
 	return nil
+}
+
+func (s *TestServer) TakeTest(stream testpb.TestService_TakeTestServer) error {
+	questions, err := s.repo.GetQuestionsPerTest(context.Background(), "1")
+
+	if err != nil {
+		return err
+	}
+
+	i := 0
+
+	var currentQuestion = &models.Question{}
+
+	for {
+		if i < len(questions) {
+			currentQuestion = questions[i]
+		}
+
+		if i <= len(questions) {
+			questionToSend := &testpb.Question{
+				Id:       currentQuestion.Id,
+				Question: currentQuestion.Question,
+			}
+
+			err := stream.Send(questionToSend)
+			if err != nil {
+				return err
+			}
+			i++
+		}
+		answer, err := stream.Recv()
+		if err == io.EOF {
+			return nil
+		}
+
+		if err != nil {
+			return err
+		}
+		fmt.Println("Answer:", answer.GetAnswer())
+	}
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net"
 
@@ -25,6 +26,7 @@ func main() {
 	}
 	srv := server.NewStudentServer(repo)
 
+	fmt.Println("SERVER STUDENT RUNNING ON PORT 5060")
 	s := grpc.NewServer()
 
 	studentpb.RegisterStudentServiceServer(s, srv)

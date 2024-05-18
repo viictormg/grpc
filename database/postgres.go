@@ -122,5 +122,32 @@ func (p *PostgresRepository) SetEnrollment(ctx context.Context, enrollment *mode
 	return err
 }
 
-// SetEnrollment(ctx context.Context, enrollment *models.Enrollment) error
-// 	GetStudentsPerTest(ctx context.Context, testId string) ([]*models.Student, error)
+func (p *PostgresRepository) GetQuestionsPerTest(ctx context.Context, testId string) ([]*models.Question, error) {
+
+	rows, err := p.db.QueryContext(ctx, "SELECT id, question FROM questions WHERE test_id = $1", testId)
+	if err != nil {
+		return nil, err
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer func() {
+		err := rows.Close()
+		if err != nil {
+			panic(err)
+		}
+	}()
+
+	var questions []*models.Question
+	for rows.Next() {
+		var question = models.Question{}
+		err := rows.Scan(&question.Id, &question.Question)
+		if err != nil {
+			return nil, err
+		}
+		questions = append(questions, &question)
+	}
+	return questions, nil
+}

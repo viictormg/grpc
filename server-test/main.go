@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net"
 
@@ -20,6 +21,7 @@ func main() {
 
 	repo, err := database.NewPostgresRepository("postgres://postgresql:tx7L8AMk91SDNS@localhost:5432/prenlink-db?sslmode=disable")
 
+	fmt.Println("SERVER TEST RUNNING ON PORT 5070")
 	if err != nil {
 		log.Fatal(err)
 	}
